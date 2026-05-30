@@ -1,0 +1,275 @@
+@model Ktr_GiuaKy.Models.Product
+
+@{
+    ViewData["Title"] = "Edit Computer Info";
+}
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #0b0f19;
+        color: #f1f5f9;
+    }
+
+    .bg-grid {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+        background-size: 40px 40px;
+        z-index: -2;
+        pointer-events: none;
+    }
+
+    .form-card {
+        background: rgba(17, 24, 39, 0.6);
+        border-radius: 26px;
+        box-shadow: 0 20px 45px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        overflow: hidden;
+        backdrop-filter: blur(20px);
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 27, 75, 0.8) 100%);
+        color: white;
+        padding: 2.5rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .form-body {
+        padding: 3rem;
+    }
+
+    .form-label {
+        font-weight: 700;
+        color: #94a3b8;
+        font-size: 0.9rem;
+        margin-bottom: 0.6rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .form-control, .form-select {
+        background-color: rgba(255, 255, 255, 0.04) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        color: white !important;
+        border-radius: 14px;
+        padding: 0.85rem 1.25rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #6366f1 !important;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.25) !important;
+        background-color: rgba(255, 255, 255, 0.07) !important;
+        outline: none;
+    }
+
+    .form-select option {
+        background-color: #0f172a;
+        color: white;
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: white;
+        font-weight: 700;
+        border-radius: 14px;
+        padding: 0.9rem 2.5rem;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-submit:hover {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(99, 102, 241, 0.5);
+    }
+
+    .btn-cancel {
+        border-radius: 14px;
+        padding: 0.9rem 2.2rem;
+        font-weight: 700;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: #e2e8f0;
+        background-color: rgba(255, 255, 255, 0.04);
+        transition: all 0.3s ease;
+    }
+
+    .btn-cancel:hover {
+        background-color: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+
+    .img-preview-box {
+        border: 2px dashed rgba(255, 255, 255, 0.15);
+        border-radius: 20px;
+        height: 230px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(11, 15, 25, 0.6);
+        overflow: hidden;
+        position: relative;
+        transition: border-color 0.3s ease;
+    }
+
+    .img-preview-box:hover {
+        border-color: #6366f1;
+    }
+
+    .img-preview {
+        max-width: 90%;
+        max-height: 90%;
+        object-fit: contain;
+        filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5));
+    }
+</style>
+
+<div class="bg-grid"></div>
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="form-card">
+                <!-- Header -->
+                <div class="form-header text-center">
+                    <h2 class="fw-extrabold mb-1" style="font-weight: 800; background: linear-gradient(to right, #ffffff, #c7d2fe); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Edit Computer Details</h2>
+                    <p class="text-white-50 mb-0" style="color: #94a3b8 !important;">Update listing details, pricing, and stock quantity for @Model.Name.</p>
+                </div>
+
+                <!-- Form -->
+                <form asp-action="Edit" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <div class="form-body">
+                        <!-- Validation summary -->
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger" style="background-color: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171;" role="alert"></div>
+
+                        <!-- Hidden fields to preserve unchanged values -->
+                        <input type="hidden" asp-for="Id" />
+                        <input type="hidden" asp-for="Sku" />
+                        <input type="hidden" asp-for="Slug" />
+                        <input type="hidden" asp-for="MainImage" />
+                        <input type="hidden" asp-for="Status" />
+                        <input type="hidden" asp-for="CreatedAt" />
+
+                        <div class="row g-4">
+                            <!-- Left column -->
+                            <div class="col-md-7">
+                                <!-- Name -->
+                                <div class="mb-3">
+                                    <label asp-for="Name" class="form-label">Computer Name <span class="text-danger">*</span></label>
+                                    <input asp-for="Name" class="form-control" required />
+                                    <span asp-validation-for="Name" class="text-danger fs-7 d-block mt-1" style="color: #f87171;"></span>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <!-- Brand -->
+                                    <div class="col-6">
+                                        <label asp-for="BrandId" class="form-label">Brand <span class="text-danger">*</span></label>
+                                        <select asp-for="BrandId" class="form-select" asp-items="ViewBag.BrandId" required></select>
+                                        <span asp-validation-for="BrandId" class="text-danger fs-7 d-block mt-1" style="color: #f87171;"></span>
+                                    </div>
+                                    <!-- Category -->
+                                    <div class="col-6">
+                                        <label asp-for="CategoryId" class="form-label">Category <span class="text-danger">*</span></label>
+                                        <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId" required></select>
+                                        <span asp-validation-for="CategoryId" class="text-danger fs-7 d-block mt-1" style="color: #f87171;"></span>
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <!-- Price -->
+                                    <div class="col-6">
+                                        <label asp-for="Price" class="form-label">Retail Price (VND) <span class="text-danger">*</span></label>
+                                        <input asp-for="Price" type="number" step="1000" class="form-control" min="1000" required />
+                                        <span asp-validation-for="Price" class="text-danger fs-7 d-block mt-1" style="color: #f87171;"></span>
+                                    </div>
+                                    <!-- Quantity -->
+                                    <div class="col-6">
+                                        <label asp-for="Quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
+                                        <input asp-for="Quantity" type="number" class="form-control" min="0" required />
+                                        <span asp-validation-for="Quantity" class="text-danger fs-7 d-block mt-1" style="color: #f87171;"></span>
+                                    </div>
+                                </div>
+
+                                <!-- SKU & Slug read-only display -->
+                                <div class="row mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label">SKU (Read Only)</label>
+                                        <input class="form-control bg-light text-muted font-monospace" style="background-color: rgba(255,255,255,0.02) !important; border-color: rgba(255,255,255,0.06) !important; color: #94a3b8 !important;" value="@Model.Sku" readonly />
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label">Slug (Read Only)</label>
+                                        <input class="form-control bg-light text-muted" style="background-color: rgba(255,255,255,0.02) !important; border-color: rgba(255,255,255,0.06) !important; color: #94a3b8 !important;" value="@Model.Slug" readonly />
+                                    </div>
+                                </div>
+
+                                <!-- Short Description -->
+                                <div class="mb-3">
+                                    <label asp-for="ShortDescription" class="form-label">Short Summary</label>
+                                    <input asp-for="ShortDescription" class="form-control" />
+                                    <span asp-validation-for="ShortDescription" class="text-danger fs-7" style="color: #f87171;"></span>
+                                </div>
+                            </div>
+
+                            <!-- Right column (Image Upload & Preview) -->
+                            <div class="col-md-5">
+                                <div class="mb-4">
+                                    <label class="form-label d-block">Thumbnail Image</label>
+                                    <div class="img-preview-box mb-3">
+                                        <img id="imgPreview" class="img-preview" src="@Model.MainImage" alt="Current image" onerror="this.src='https://images.unsplash.com/photo-1587829741301-dc798b83add3?q=80&w=600&auto=format&fit=crop'" />
+                                    </div>
+                                    <input type="file" id="imageFileInput" name="imageFile" class="form-control" accept="image/*" onchange="previewFile()" />
+                                    <p class="text-muted mt-2 mb-0" style="font-size: 0.8rem; color: #64748b !important;">Leave blank to preserve current thumbnail image.</p>
+                                </div>
+                            </div>
+
+                            <!-- Full Description / Specifications -->
+                            <div class="col-12 mt-2">
+                                <div class="mb-3">
+                                    <label asp-for="FullDescription" class="form-label">Technical Specifications (Full Description)</label>
+                                    <textarea asp-for="FullDescription" rows="4" class="form-control"></textarea>
+                                    <span asp-validation-for="FullDescription" class="text-danger fs-7" style="color: #f87171;"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="d-flex justify-content-end gap-3 mt-5 pt-4" style="border-top: 1px solid rgba(255, 255, 255, 0.08);">
+                            <a href="@Url.Action("AdminList")" class="btn btn-cancel">Cancel</a>
+                            <button type="submit" class="btn btn-submit">Save Changes</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function previewFile() {
+        const preview = document.getElementById('imgPreview');
+        const file = document.getElementById('imageFileInput').files[0];
+        const reader = new FileReader();
+
+        reader.addEventListener("load", function () {
+            // convert image file to base64 string
+            preview.src = reader.result;
+        }, false);
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    }
+</script>

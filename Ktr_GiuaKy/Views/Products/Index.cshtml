@@ -1,0 +1,467 @@
+@model IEnumerable<Ktr_GiuaKy.Models.Product>
+
+@{
+    ViewData["Title"] = "NextGen Showroom";
+    var brands = ViewBag.Brands as IEnumerable<Ktr_GiuaKy.Models.Brand> ?? new List<Ktr_GiuaKy.Models.Brand>();
+}
+
+<!-- Custom Styles for High-End Premium Aesthetics -->
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #0b0f19;
+        color: #f1f5f9;
+        overflow-x: hidden;
+    }
+
+    .bg-grid {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+        background-size: 40px 40px;
+        z-index: -2;
+        pointer-events: none;
+    }
+
+    .bg-glows {
+        position: fixed;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.08) 0%, transparent 70%);
+        top: -10%;
+        right: -10%;
+        z-index: -1;
+        pointer-events: none;
+        filter: blur(80px);
+    }
+
+    .bg-glows-2 {
+        position: fixed;
+        width: 500px;
+        height: 500px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(14, 165, 233, 0.06) 0%, transparent 70%);
+        bottom: -10%;
+        left: -10%;
+        z-index: -1;
+        pointer-events: none;
+        filter: blur(80px);
+    }
+
+    .hero-banner {
+        background: linear-gradient(135deg, rgba(15, 23, 42, 0.8) 0%, rgba(30, 27, 75, 0.8) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(20px);
+        color: #ffffff;
+        border-radius: 30px;
+        padding: 5rem 3rem;
+        margin-bottom: 4rem;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.5);
+    }
+
+    .hero-banner::before {
+        content: '';
+        position: absolute;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%);
+        top: -50px;
+        right: -50px;
+        filter: blur(30px);
+    }
+
+    .search-box-container {
+        position: relative;
+        max-width: 550px;
+        width: 100%;
+    }
+
+    .search-box {
+        border-radius: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(255, 255, 255, 0.05) !important;
+        color: white !important;
+        padding: 1rem 1.75rem;
+        font-size: 1.05rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(10px);
+    }
+
+    .search-box::placeholder {
+        color: rgba(255, 255, 255, 0.4);
+    }
+
+    .search-box:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 25px rgba(99, 102, 241, 0.3);
+        background: rgba(255, 255, 255, 0.08) !important;
+        outline: none;
+    }
+
+    .btn-search {
+        border-radius: 16px;
+        padding: 0.8rem 2.2rem;
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: white;
+        font-weight: 700;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        position: absolute;
+        right: 8px;
+        top: 8px;
+    }
+
+    .btn-search:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.6);
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+    }
+
+    .brand-filter-bar {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 24px;
+        padding: 1rem;
+        backdrop-filter: blur(10px);
+    }
+
+    .brand-badge {
+        font-size: 0.95rem;
+        padding: 0.6rem 1.5rem;
+        border-radius: 14px;
+        background-color: rgba(255, 255, 255, 0.05);
+        color: #94a3b8;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        display: inline-block;
+        margin: 0.25rem;
+    }
+
+    .brand-badge:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+        transform: translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .brand-badge.active {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: white;
+        border-color: #6366f1;
+        box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.4);
+    }
+
+    .product-card {
+        background: rgba(17, 24, 39, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 24px;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        box-shadow: 0 15px 35px -10px rgba(0, 0, 0, 0.3);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        backdrop-filter: blur(10px);
+    }
+
+    .product-card::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 24px;
+        border: 2px solid transparent;
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.4) 0%, rgba(14, 165, 233, 0.2) 100%) border-box;
+        -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+        -webkit-mask-composite: destination-out;
+        mask-composite: exclude;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .product-card:hover {
+        transform: translateY(-12px);
+        box-shadow: 0 30px 50px -10px rgba(99, 102, 241, 0.15);
+        border-color: rgba(99, 102, 241, 0.2);
+    }
+
+    .product-card:hover::after {
+        opacity: 1;
+    }
+
+    .image-container {
+        position: relative;
+        padding-top: 60%;
+        background-color: #0b0f19;
+        overflow: hidden;
+    }
+
+    .product-img {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .product-card:hover .product-img {
+        transform: scale(1.1);
+    }
+
+    .image-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, transparent 60%, rgba(11, 15, 25, 0.8) 100%);
+        pointer-events: none;
+    }
+
+    .badge-status {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        padding: 0.5rem 1.25rem;
+        font-weight: 700;
+        font-size: 0.75rem;
+        border-radius: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        backdrop-filter: blur(8px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+
+    .status-in-stock {
+        background-color: rgba(16, 185, 129, 0.2);
+        color: #34d399;
+        border: 1px solid rgba(52, 211, 153, 0.3);
+    }
+
+    .status-out-stock {
+        background-color: rgba(239, 68, 68, 0.2);
+        color: #f87171;
+        border: 1px solid rgba(248, 113, 113, 0.3);
+    }
+
+    .product-info {
+        padding: 2rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        background: rgba(15, 23, 42, 0.3);
+    }
+
+    .brand-name {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        font-weight: 800;
+        letter-spacing: 0.15em;
+        color: #818cf8;
+        margin-bottom: 0.5rem;
+    }
+
+    .product-name {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 0.75rem;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        height: 3.78rem;
+        transition: color 0.3s ease;
+    }
+
+    .product-card:hover .product-name {
+        color: #818cf8;
+    }
+
+    .price-tag {
+        font-size: 1.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #ffffff 0%, #94a3b8 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .btn-details {
+        border-radius: 14px;
+        font-weight: 700;
+        padding: 0.7rem 1.4rem;
+        background-color: rgba(255, 255, 255, 0.06);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .product-card:hover .btn-details {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: white;
+        border-color: #6366f1;
+        box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+        transform: translateY(-2px);
+    }
+
+    .admin-link-card {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.7) 100%);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 26px;
+        padding: 2.5rem 3rem;
+        color: white;
+        margin-top: 6rem;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(20px);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .admin-link-card::before {
+        content: '';
+        position: absolute;
+        width: 150px;
+        height: 150px;
+        background: radial-gradient(circle, rgba(59, 130, 246, 0.15) 0%, transparent 70%);
+        bottom: -50px;
+        left: -50px;
+        filter: blur(20px);
+    }
+
+    .btn-manage {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white;
+        border: none;
+        border-radius: 16px;
+        padding: 0.9rem 2.2rem;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+    }
+
+    .btn-manage:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5);
+        background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+        color: white;
+    }
+</style>
+
+<div class="bg-grid"></div>
+<div class="bg-glows"></div>
+<div class="bg-glows-2"></div>
+
+<div class="container py-4">
+    <div class="hero-banner text-center text-md-start">
+        <div class="row align-items-center g-5">
+            <div class="col-md-7 ps-md-5">
+                <span class="badge bg-indigo-subtle text-indigo border border-indigo-subtle px-3 py-2 rounded-pill mb-3" style="font-weight: 700; letter-spacing: 0.05em; background-color: rgba(99, 102, 241, 0.15); color: #818cf8; border-color: rgba(99, 102, 241, 0.3);">NEXT-GEN COMPUTERS 2026</span>
+                <h1 class="display-3 fw-extrabold mb-3" style="letter-spacing: -2px; font-weight: 800; background: linear-gradient(to right, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Future Showroom</h1>
+                <p class="lead text-slate-400 mb-4" style="color: #94a3b8; font-size: 1.15rem; line-height: 1.6;">Unlock unmatched performance. Step into our curated universe of elite laptops, supreme workstations, and beastly liquid-cooled desktops.</p>
+                
+                <!-- Search Box Inside Hero -->
+                <form method="get" action="@Url.Action("Index")">
+                    <input type="hidden" name="brandId" value="@ViewBag.SelectedBrandId" />
+                    <div class="search-box-container mt-2">
+                        <input type="text" name="searchString" value="@ViewBag.SearchString" class="form-control search-box" placeholder="Search elite computer models..." />
+                        <button class="btn btn-search" type="submit">Search</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-5 d-none d-md-block text-center">
+                <img src="https://images.unsplash.com/photo-1593642632823-8f785ba67e45?q=80&w=500&auto=format&fit=crop" class="img-fluid rounded-4" alt="NextGen Systems" style="max-height: 300px; object-fit: cover; border: 1px solid rgba(255, 255, 255, 0.1); box-shadow: 0 25px 50px rgba(0,0,0,0.5);">
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter and Search Row -->
+    <div class="brand-filter-bar mb-5">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-start">
+            <a href="@Url.Action("Index", new { searchString = ViewBag.SearchString })" 
+               class="brand-badge @(ViewBag.SelectedBrandId == null ? "active" : "")">All Systems</a>
+            @foreach (var brand in brands)
+            {
+                <a href="@Url.Action("Index", new { brandId = brand.Id, searchString = ViewBag.SearchString })" 
+                   class="brand-badge @(ViewBag.SelectedBrandId == brand.Id ? "active" : "")">@brand.Name</a>
+            }
+        </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @if (Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                <div class="col">
+                    <div class="product-card">
+                        <div class="image-container">
+                            <img src="@item.MainImage" class="product-img" alt="@item.Name" onerror="this.src='https://images.unsplash.com/photo-1587829741301-dc798b83add3?q=80&w=600&auto=format&fit=crop'">
+                            <div class="image-overlay"></div>
+                            @if (item.Quantity > 0)
+                            {
+                                <span class="badge-status status-in-stock">In Stock</span>
+                            }
+                            else
+                            {
+                                <span class="badge-status status-out-stock">Out of Stock</span>
+                            }
+                        </div>
+                        <div class="product-info">
+                            <div>
+                                <div class="brand-name">@item.Brand.Name</div>
+                                <h3 class="product-name">@item.Name</h3>
+                                <p class="text-slate-400" style="color: #94a3b8; font-size: 0.92rem; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 2.76rem;">@item.ShortDescription</p>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-3 pt-3" style="border-top: 1px solid rgba(255, 255, 255, 0.08);">
+                                <div class="price-tag">@String.Format("{0:N0} ₫", item.Price)</div>
+                                <a href="@Url.Action("Details", new { id = item.Id })" class="btn btn-details">Inspect</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <div class="text-muted fs-4">No computer configurations match your selection.</div>
+                <a href="@Url.Action("Index")" class="btn btn-outline-light mt-3 rounded-pill px-4" style="border-color: rgba(255,255,255,0.2);">Reset Filters</a>
+            </div>
+        }
+    </div>
+
+    <!-- Administrative Link Card -->
+    <div class="admin-link-card">
+        <div class="row align-items-center g-4 text-center text-md-start">
+            <div class="col-md-8 ps-md-4">
+                <h3 class="fw-bold mb-2" style="font-weight: 800; letter-spacing: -0.5px;">Store Control Center</h3>
+                <p class="mb-0" style="color: #94a3b8; font-size: 1.05rem;">Access administration tools to add inventory, modify prices, control stocks, and delete computer configurations.</p>
+            </div>
+            <div class="col-md-4 text-md-end pe-md-4">
+                <a href="@Url.Action("AdminList")" class="btn btn-manage btn-lg rounded-pill">Manage Store</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,399 @@
+@model IEnumerable<Ktr_GiuaKy.Models.Product>
+
+@{
+    ViewData["Title"] = "Inventory Dashboard";
+    var totalProducts = Model.Count();
+    var totalQuantity = Model.Sum(p => p.Quantity);
+    var totalValue = Model.Sum(p => p.Price * p.Quantity);
+    var outOfStockCount = Model.Count(p => p.Quantity == 0);
+}
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background-color: #0b0f19;
+        color: #f1f5f9;
+    }
+
+    .bg-grid {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+        background-size: 40px 40px;
+        z-index: -2;
+        pointer-events: none;
+    }
+
+    .bg-glows {
+        position: fixed;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, transparent 70%);
+        top: -10%;
+        right: -10%;
+        z-index: -1;
+        pointer-events: none;
+        filter: blur(80px);
+    }
+
+    .dashboard-card {
+        background: rgba(17, 24, 39, 0.6);
+        border-radius: 20px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
+        backdrop-filter: blur(10px);
+    }
+
+    .dashboard-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 30px rgba(99, 102, 241, 0.1);
+        border-color: rgba(99, 102, 241, 0.2);
+    }
+
+    .icon-wrapper {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .table-container {
+        background: rgba(17, 24, 39, 0.6);
+        border-radius: 24px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+    }
+
+    .custom-table {
+        background-color: transparent !important;
+    }
+
+    .custom-table th {
+        background-color: rgba(15, 23, 42, 0.6) !important;
+        font-weight: 700;
+        color: #94a3b8;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+        padding: 1.25rem 1rem;
+    }
+
+    .custom-table td {
+        padding: 1.25rem 1rem;
+        vertical-align: middle;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        color: #e2e8f0;
+        background-color: transparent !important;
+    }
+
+    .custom-table tr:hover td {
+        background-color: rgba(255, 255, 255, 0.02) !important;
+    }
+
+    .thumbnail-img {
+        width: 65px;
+        height: 48px;
+        object-fit: cover;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background-color: #0b0f19;
+    }
+
+    .badge-status {
+        padding: 0.4rem 0.9rem;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .badge-in-stock {
+        background-color: rgba(16, 185, 129, 0.15);
+        color: #34d399;
+        border: 1px solid rgba(52, 211, 153, 0.3);
+    }
+
+    .badge-out-stock {
+        background-color: rgba(239, 68, 68, 0.15);
+        color: #f87171;
+        border: 1px solid rgba(248, 113, 113, 0.3);
+    }
+
+    .search-box {
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(255, 255, 255, 0.04);
+        color: white !important;
+        padding: 0.75rem 1.25rem;
+        transition: all 0.3s ease;
+    }
+
+    .search-box:focus {
+        border-color: #6366f1;
+        box-shadow: 0 0 20px rgba(99, 102, 241, 0.25);
+        background: rgba(255, 255, 255, 0.07);
+        outline: none;
+    }
+
+    .btn-create {
+        background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+        color: white;
+        font-weight: 700;
+        border-radius: 14px;
+        padding: 0.75rem 1.75rem;
+        border: none;
+        transition: all 0.3s ease;
+        box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-create:hover {
+        background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(99, 102, 241, 0.5);
+    }
+
+    .action-btn {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
+        color: #94a3b8;
+        transition: all 0.2s ease;
+        text-decoration: none;
+    }
+
+    .action-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .action-btn.btn-delete:hover {
+        background: rgba(239, 68, 68, 0.15);
+        color: #f87171;
+        border-color: rgba(239, 68, 68, 0.4);
+    }
+
+    .stats-title {
+        color: #94a3b8;
+        font-weight: 600;
+    }
+</style>
+
+<div class="bg-grid"></div>
+<div class="bg-glows"></div>
+
+<div class="container py-4">
+    <!-- Header -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 pb-3" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+        <div>
+            <h1 class="fw-extrabold display-5 mb-1" style="font-weight: 800; background: linear-gradient(to right, #ffffff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Inventory Dashboard</h1>
+            <p class="text-muted mb-0" style="color: #94a3b8 !important;">Supervise retail listings, update detailed specs, and control warehouse levels.</p>
+        </div>
+        <div class="mt-3 mt-md-0 d-flex gap-2">
+            <a href="@Url.Action("Index")" class="btn btn-outline-light px-4 fw-bold" style="border-radius: 14px; padding: 0.75rem 1.75rem; border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.03);">
+                Showroom
+            </a>
+            <a href="@Url.Action("Create")" class="btn btn-create">
+                + Add Computer
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Cards Grid -->
+    <div class="row g-4 mb-5">
+        <div class="col-6 col-lg-3">
+            <div class="dashboard-card p-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="stats-title fs-6 d-block mb-1">Total Models</span>
+                    <span class="fs-2 fw-bold text-white">@totalProducts</span>
+                </div>
+                <div class="icon-wrapper" style="background-color: rgba(99, 102, 241, 0.15); color: #818cf8;">
+                    🖥️
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="dashboard-card p-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="stats-title fs-6 d-block mb-1">Stock Quantity</span>
+                    <span class="fs-2 fw-bold text-white">@totalQuantity</span>
+                </div>
+                <div class="icon-wrapper" style="background-color: rgba(16, 185, 129, 0.15); color: #34d399;">
+                    📦
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="dashboard-card p-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="stats-title fs-6 d-block mb-1">Stock Value</span>
+                    <span class="fs-4 fw-bold text-white">@String.Format("{0:N0} ₫", totalValue)</span>
+                </div>
+                <div class="icon-wrapper" style="background-color: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+                    💰
+                </div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="dashboard-card p-4 d-flex align-items-center justify-content-between">
+                <div>
+                    <span class="stats-title fs-6 d-block mb-1">Out of Stock</span>
+                    <span class="fs-2 fw-bold text-danger">@outOfStockCount</span>
+                </div>
+                <div class="icon-wrapper" style="background-color: rgba(239, 68, 68, 0.15); color: #f87171;">
+                    ⚠️
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter and search bar -->
+    <div class="row mb-4 align-items-center justify-content-between g-3">
+        <div class="col-md-5">
+            <form method="get" action="@Url.Action("AdminList")">
+                <div class="input-group">
+                    <input type="text" name="searchString" value="@ViewBag.SearchString" class="form-control search-box" placeholder="Search by name, brand, SKU..." />
+                    <button class="btn btn-dark px-4" type="submit" style="border-top-right-radius: 14px; border-bottom-right-radius: 14px; background-color: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.12); border-left: none;">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Table Container -->
+    <div class="table-container">
+        <div class="table-responsive">
+            <table class="table custom-table mb-0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Image</th>
+                        <th>SKU</th>
+                        <th>Name</th>
+                        <th>Brand</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Status</th>
+                        <th class="text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Any())
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td class="fw-semibold text-muted">@item.Id</td>
+                                <td>
+                                    <img src="@item.MainImage" class="thumbnail-img" alt="@item.Name" onerror="this.src='https://images.unsplash.com/photo-1587829741301-dc798b83add3?q=80&w=600&auto=format&fit=crop'">
+                                </td>
+                                <td class="text-slate-400 font-monospace" style="font-size: 0.85rem; color: #94a3b8;">@item.Sku</td>
+                                <td class="fw-bold text-white">@item.Name</td>
+                                <td>
+                                    <span class="badge" style="background-color: rgba(99, 102, 241, 0.15); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.3);">@item.Brand.Name</span>
+                                </td>
+                                <td class="fw-bold" style="color: #cbd5e1;">@String.Format("{0:N0} ₫", item.Price)</td>
+                                <td class="fw-semibold">@item.Quantity</td>
+                                <td>
+                                    @if (item.Quantity > 0)
+                                    {
+                                        <span class="badge-status badge-in-stock">In Stock</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge-status badge-out-stock">Out of Stock</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <a href="@Url.Action("Details", new { id = item.Id })" class="action-btn" title="View details">
+                                            👁️
+                                        </a>
+                                        <a href="@Url.Action("Edit", new { id = item.Id })" class="action-btn" title="Edit listing">
+                                            ✏️
+                                        </a>
+                                        <button type="button" class="action-btn btn-delete" title="Delete listing" 
+                                                onclick="openDeleteModal(@item.Id, '@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(item.Name))')">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="9" class="text-center py-5">
+                                <span class="text-muted fs-5">No computers found in active stock database.</span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Beautiful Custom Delete Modal (Dark Glassmorphic) -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg" style="background-color: #111827; border: 1px solid rgba(255,255,255,0.08) !important; color: white;">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center p-4">
+                <div class="mb-3" style="font-size: 3rem;">⚠️</div>
+                <h4 class="fw-bold text-white mb-2">Delete Computer Listing?</h4>
+                <p class="text-slate-400 mb-4" style="color: #94a3b8;">Are you sure you want to permanently remove <strong id="deleteComputerName" class="text-white"></strong> from your active store inventory? This operation cannot be undone.</p>
+                
+                <form id="deleteForm" method="post" action="@Url.Action("Delete")">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="deleteComputerId" name="id" />
+                    
+                    <div class="d-flex gap-3 justify-content-center">
+                        <button type="button" class="btn btn-outline-light px-4 py-2 fw-semibold" data-bs-dismiss="modal" style="border-radius: 12px; border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.02);">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn btn-danger px-4 py-2 fw-semibold" style="border-radius: 12px; background-color: #ef4444; border-color: #ef4444; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);">
+                            Confirm Delete
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openDeleteModal(id, name) {
+        document.getElementById('deleteComputerId').value = id;
+        document.getElementById('deleteComputerName').innerText = name;
+        
+        var modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+        modal.show();
+    }
+</script>
